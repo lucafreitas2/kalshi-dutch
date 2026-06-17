@@ -39,140 +39,40 @@ function calcDutch(legs, totalStake) {
 
 // ── Country code → flag emoji ─────────────────────────────────────────────
 
-const TEAM_FLAGS = {
-  'Argentina': '\uD83C\uDDE6\uD83C\uDDF7',
-  'Austria': '\uD83C\uDDE6\uD83C\uDDF9',
-  'Algeria': '\uD83C\uDDE9\uD83C\uDDFF',
-  'Jordan': '\uD83C\uDDEF\uD83C\uDDF4',
-  'Portugal': '\uD83C\uDDF5\uD83C\uDDF9',
-  'Colombia': '\uD83C\uDDE8\uD83C\uDDF4',
-  'Uzbekistan': '\uD83C\uDDFA\uD83C\uDDFF',
-  'Congo DR': '\uD83C\uDDE8\uD83C\uDDE9',
-  'England': '\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62\uDB40\uDC65\uDB40\uDC6E\uDB40\uDC67\uDB40\uDC7F',
-  'Croatia': '\uD83C\uDDED\uD83C\uDDF7',
-  'Panama': '\uD83C\uDDF5\uD83C\uDDE6',
-  'Ghana': '\uD83C\uDDEC\uD83C\uDDED',
-  'France': '\uD83C\uDDEB\uD83C\uDDF7',
-  'Senegal': '\uD83C\uDDF8\uD83C\uDDF3',
-  'Norway': '\uD83C\uDDF3\uD83C\uDDF4',
-  'Iraq': '\uD83C\uDDEE\uD83C\uDDF6',
-  'Spain': '\uD83C\uDDEA\uD83C\uDDF8',
-  'Uruguay': '\uD83C\uDDFA\uD83C\uDDFE',
-  'Saudi Arabia': '\uD83C\uDDF8\uD83C\uDDE6',
-  'Cape Verde': '\uD83C\uDDE8\uD83C\uDDFB',
-  'Belgium': '\uD83C\uDDE7\uD83C\uDDEA',
-  'IR Iran': '\uD83C\uDDEE\uD83C\uDDF7',
-  'Egypt': '\uD83C\uDDEA\uD83C\uDDEC',
-  'New Zealand': '\uD83C\uDDF3\uD83C\uDDFF',
-  'Netherlands': '\uD83C\uDDF3\uD83C\uDDF1',
-  'Japan': '\uD83C\uDDEF\uD83C\uDDF5',
-  'Tunisia': '\uD83C\uDDF9\uD83C\uDDF3',
-  'Germany': '\uD83C\uDDE9\uD83C\uDDEA',
-  'Ecuador': '\uD83C\uDDEA\uD83C\uDDE8',
-  'Ivory Coast': '\uD83C\uDDE8\uD83C\uDDEE',
-  'Curacao': '\uD83C\uDDE8\uD83C\uDDFC',
-  'USA': '\uD83C\uDDFA\uD83C\uDDF8',
-  'Australia': '\uD83C\uDDE6\uD83C\uDDFA',
-  'Paraguay': '\uD83C\uDDF5\uD83C\uDDFE',
-  'Turkiye': '\uD83C\uDDF9\uD83C\uDDF7',
-  'Brazil': '\uD83C\uDDE7\uD83C\uDDF7',
-  'Morocco': '\uD83C\uDDF2\uD83C\uDDE6',
-  'Scotland': '\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62\uDB40\uDC73\uDB40\uDC63\uDB40\uDC74\uDB40\uDC7F',
-  'Haiti': '\uD83C\uDDED\uD83C\uDDF9',
-  'Canada': '\uD83C\uDDE8\uD83C\uDDE6',
-  'Switzerland': '\uD83C\uDDE8\uD83C\uDDED',
-  'Qatar': '\uD83C\uDDF6\uD83C\uDDE6',
-  'Mexico': '\uD83C\uDDF2\uD83C\uDDFD',
-  'Korea Republic': '\uD83C\uDDF0\uD83C\uDDF7',
-  'South Africa': '\uD83C\uDDFF\uD83C\uDDE6',
-  'Denmark': '\uD83C\uDDE9\uD83C\uDDF0',
-  'Bosnia and Herzegovina': '\uD83C\uDDE7\uD83C\uDDE6',
-  'Czechia': '\uD83C\uDDE8\uD83C\uDDFF',
-  'Sweden': '\uD83C\uDDF8\uD83C\uDDEA',
-  'Poland': '\uD83C\uDDF5\uD83C\uDDF1',
-  'Ukraine': '\uD83C\uDDFA\uD83C\uDDE6',
-  'Tie': '\uD83E\uDD1D',
+const TEAM_ISO = {
+  'Argentina': 'ar', 'Austria': 'at', 'Algeria': 'dz', 'Jordan': 'jo',
+  'Portugal': 'pt', 'Colombia': 'co', 'Uzbekistan': 'uz', 'Congo DR': 'cd',
+  'England': 'gb-eng', 'Croatia': 'hr', 'Panama': 'pa', 'Ghana': 'gh',
+  'France': 'fr', 'Senegal': 'sn', 'Norway': 'no', 'Iraq': 'iq',
+  'Spain': 'es', 'Uruguay': 'uy', 'Saudi Arabia': 'sa', 'Cape Verde': 'cv',
+  'Belgium': 'be', 'IR Iran': 'ir', 'Egypt': 'eg', 'New Zealand': 'nz',
+  'Netherlands': 'nl', 'Japan': 'jp', 'Tunisia': 'tn',
+  'Germany': 'de', 'Ecuador': 'ec', 'Ivory Coast': 'ci', 'Curacao': 'cw',
+  'USA': 'us', 'Australia': 'au', 'Paraguay': 'py', 'Turkiye': 'tr',
+  'Brazil': 'br', 'Morocco': 'ma', 'Scotland': 'gb-sct', 'Haiti': 'ht',
+  'Canada': 'ca', 'Switzerland': 'ch', 'Qatar': 'qa',
+  'Mexico': 'mx', 'Korea Republic': 'kr', 'South Africa': 'za', 'Denmark': 'dk',
+  'Bosnia and Herzegovina': 'ba', 'Czechia': 'cz', 'Sweden': 'se',
+  'Poland': 'pl', 'Ukraine': 'ua',
 };
 
-function getFlag(teamName) {
-  return TEAM_FLAGS[teamName] || '🏳️';
+function FlagImg({ teamName }) {
+  const iso = TEAM_ISO[teamName];
+  if (!iso) return null;
+  return (
+    <img
+      src={`https://flagcdn.com/24x18/${iso}.png`}
+      width="24"
+      height="18"
+      alt={teamName}
+      style={{ borderRadius: 2, verticalAlign: 'middle', marginRight: 4 }}
+    />
+  );
 }
 
-const MATCH_CITIES = {
-  // June 16
-  'KXWCGAME-26JUN16ARGALG': 'Kansas City',
-  'KXWCGAME-26JUN16AUTJOR': 'San Francisco',
-  'KXWCGAME-26JUN16FRANSEN': 'New York/NJ',
-  'KXWCGAME-26JUN16IRNOR': 'Boston',
-  // June 17
-  'KXWCGAME-26JUN17PORFIF': 'Houston',
-  'KXWCGAME-26JUN17ENGCRO': 'Dallas',
-  'KXWCGAME-26JUN17GHAPAN': 'Toronto',
-  'KXWCGAME-26JUN17UZBCOL': 'Mexico City',
-  // June 18
-  'KXWCGAME-26JUN18RSADEN': 'Atlanta',
-  'KXWCGAME-26JUN18SUIQAT': 'Los Angeles',
-  'KXWCGAME-26JUN18CANQAT': 'Vancouver',
-  'KXWCGAME-26JUN18MEXKOR': 'Guadalajara',
-  // June 19
-  'KXWCGAME-26JUN19SCOМAR': 'Boston',
-  'KXWCGAME-26JUN19USAAUS': 'Seattle',
-  'KXWCGAME-26JUN19BRAHAI': 'Philadelphia',
-  'KXWCGAME-26JUN19TURPAR': 'San Francisco',
-  // June 20
-  'KXWCGAME-26JUN20NEDJPN': 'Houston',
-  'KXWCGAME-26JUN20GERCUW': 'Toronto',
-  'KXWCGAME-26JUN20ECUCUW': 'Kansas City',
-  'KXWCGAME-26JUN20TUNJPN': 'Monterrey',
-  // June 21
-  'KXWCGAME-26JUN21ESPCPV': 'Atlanta',
-  'KXWCGAME-26JUN21BELIRN': 'Los Angeles',
-  'KXWCGAME-26JUN21URUCPV': 'Miami',
-  'KXWCGAME-26JUN21NZLEGY': 'Vancouver',
-  // June 22
-  'KXWCGAME-26JUN22ARGAUT': 'Dallas',
-  'KXWCGAME-26JUN22JORDZA': 'San Francisco',
-  'KXWCGAME-26JUN22NORSEN': 'New York/NJ',
-  'KXWCGAME-26JUN22FRAIRQ': 'Philadelphia',
-  // June 23
-  'KXWCGAME-26JUN23PORUZB': 'Houston',
-  'KXWCGAME-26JUN23ENGCRO': 'Miami',
-  'KXWCGAME-26JUN23COLCOD': 'Atlanta',
-  'KXWCGAME-26JUN23PANCRO': 'Kansas City',
-  // June 24
-  'KXWCGAME-26JUN24ESPKSA': 'Atlanta',
-  'KXWCGAME-26JUN24BELEGY': 'Los Angeles',
-  'KXWCGAME-26JUN24URUKSA': 'Miami',
-  'KXWCGAME-26JUN24NZLEGY': 'Vancouver',
-  // June 25
-  'KXWCGAME-26JUN25GERIVO': 'Houston',
-  'KXWCGAME-26JUN25NEDTUN': 'Dallas',
-  'KXWCGAME-26JUN25ECUCIV': 'Philadelphia',
-  'KXWCGAME-26JUN25USAPAR': 'San Francisco',
-  // June 26
-  'KXWCGAME-26JUN26BRAMAR': 'New York/NJ',
-  'KXWCGAME-26JUN26SCOHАІ': 'Boston',
-  'KXWCGAME-26JUN26MEXRSA': 'Atlanta',
-  'KXWCGAME-26JUN26KORDЕN': 'Los Angeles',
-  // June 27
-  'KXWCGAME-26JUN27JORARG': 'Dallas',
-  'KXWCGAME-26JUN27DZAAUT': 'Kansas City',
-  'KXWCGAME-26JUN27COLPOR': 'Houston',
-  'KXWCGAME-26JUN27CODUZB': 'Mexico City',
-  'KXWCGAME-26JUN27PANENG': 'Toronto',
-  'KXWCGAME-26JUN27CROGHA': 'Miami',
-  'KXWCGAME-26JUN27NORIRQ': 'New York/NJ',
-  'KXWCGAME-26JUN27FRAIRQ': 'Philadelphia',
-  'KXWCGAME-26JUN27SENIRQ': 'Boston',
-};
-
-
-function formatKickoff(expectedExpirationTime) {
-  if (!expectedExpirationTime) return null;
-  // Expected expiration is ~2hrs after kickoff (90min + stoppage)
-  const expiry = new Date(expectedExpirationTime);
-  const kickoff = new Date(expiry.getTime() - 2 * 60 * 60 * 1000);
-  return kickoff.toLocaleString('en-US', {
+function formatKickoff(utcDate) {
+  if (!utcDate) return null;
+  return new Date(utcDate).toLocaleString('en-US', {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -181,6 +81,42 @@ function formatKickoff(expectedExpirationTime) {
     timeZoneName: 'short',
   });
 }
+
+const NAME_MAP = {
+  'United States': 'USA',
+  'Bosnia-Herzegovina': 'Bosnia and Herzegovina',
+  'Cape Verde Islands': 'Cape Verde',
+  'Turkey': 'Turkiye',
+  'Curaçao': 'Curacao',
+  'South Korea': 'Korea Republic',
+  'IR Iran': 'Iran',
+};
+
+function normalizeName(name) {
+  return NAME_MAP[name] || name;
+}
+
+async function fetchMatchTimes() {
+  const res = await fetch('/api/football?path=/competitions/WC/matches&season=2026');
+  if (!res.ok) return {};
+  const data = await res.json();
+
+  const lookup = {};
+  (data.matches || []).forEach(m => {
+    if (!m.homeTeam.name || !m.awayTeam.name) return;
+    const home = normalizeName(m.homeTeam.name);
+    const away = normalizeName(m.awayTeam.name);
+    const info = {
+      kickoff: m.utcDate,
+      homeCrest: m.homeTeam.crest,
+      awayCrest: m.awayTeam.crest,
+    };
+    lookup[`${home} vs ${away}`] = info;
+    lookup[`${away} vs ${home}`] = info;
+  });
+  return lookup;
+}
+
 
 // ── Kalshi fetch ─────────────────────────────────────────────────────────────
 
@@ -347,6 +283,7 @@ export default function App() {
   const [initialLoad, setInitialLoad] = useState(true);
   const [error, setError] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(null);
+  const [matchTimes, setMatchTimes] = useState({});
 
   // Shared state
   const [excluded, setExcluded] = useState(new Set());
@@ -369,6 +306,8 @@ export default function App() {
       setError(null);
       const data = await fetchMatches();
       setMatches(data);
+      const times = await fetchMatchTimes();   // ← add this
+      setMatchTimes(times);
       setLastRefresh(new Date());
       if (data.length > 0) setSelectedMatch(prev => prev ?? data[0].eventTicker);
     } catch (e) {
@@ -551,8 +490,8 @@ export default function App() {
                 </div>
                 {matches.map(m => {
                   const [team1Name, team2Name] = m.title.split(' vs ');
-                  const city = MATCH_CITIES[m.eventTicker];
-                  const kickoff = formatKickoff(m.kickoff);
+                  const timeInfo = matchTimes[m.title];        
+                  const kickoff = formatKickoff(timeInfo?.kickoff);
                   const isSelected = selectedMatch === m.eventTicker;
                   return (
                     <button key={m.eventTicker} onClick={() => setSelectedMatch(m.eventTicker)} style={{
@@ -564,14 +503,13 @@ export default function App() {
                     }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <span style={{ fontSize: 15, fontWeight: 700, color: isSelected ? "#fff" : "#ccc" }}>
-                          {getFlag(team1Name)} {team1Name}
+                          <FlagImg teamName={team1Name} />{team1Name}
                           <span style={{ color: "#555", margin: "0 6px" }}>vs</span>
-                          {getFlag(team2Name)} {team2Name}
+                          <FlagImg teamName={team2Name} />{team2Name}
                         </span>
                       </div>
                       <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
                         {kickoff && <span style={{ fontSize: 11, color: "#555" }}>🕐 {kickoff}</span>}
-                        {city && <span style={{ fontSize: 11, color: "#555" }}>📍 {city}</span>}
                       </div>
                     </button>
                   );
