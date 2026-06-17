@@ -124,7 +124,7 @@ function OutcomeRow({ outcome, excluded, onToggle, onRemove, isLive }) {
 
 function DutchResult({ result }) {
   if (!result) return null;
-  const { stakes, sumInv, hasSurplus, profit, roi, netProfit, netRoi, netHasSurplus, totalFees } = result;
+  const { stakes, sumInv, netProfit, netRoi, netHasSurplus } = result;
 
   return (
     <div style={{
@@ -133,34 +133,21 @@ function DutchResult({ result }) {
       border: `1.5px solid ${netHasSurplus ? "#00e5a0" : "#ff4d4d"}`,
     }}>
 
-      {/* Gross vs Net profit side by side */}
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+      {/* Net profit */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
         <div>
           <div style={{ color: "#888", fontSize: 11, letterSpacing: 1, textTransform: "uppercase" }}>
-            Gross Profit
+            Net Profit (after fees)
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: hasSurplus ? "#00e5a0" : "#ff4d4d" }}>
-            {hasSurplus ? "+" : "-"}${Math.abs(profit).toFixed(2)}
-          </div>
-          <div style={{ fontSize: 11, color: "#555" }}>{roi.toFixed(1)}% ROI</div>
-        </div>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ color: "#888", fontSize: 11, letterSpacing: 1, textTransform: "uppercase" }}>
-            Kalshi Fees
-          </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: "#ff8844" }}>
-            -${totalFees.toFixed(2)}
-          </div>
-          <div style={{ fontSize: 11, color: "#555" }}>across all legs</div>
-        </div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ color: "#888", fontSize: 11, letterSpacing: 1, textTransform: "uppercase" }}>
-            Net Profit
-          </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: netHasSurplus ? "#00e5a0" : "#ff4d4d" }}>
+          <div style={{ fontSize: 28, fontWeight: 800, color: netHasSurplus ? "#00e5a0" : "#ff4d4d" }}>
             {netHasSurplus ? "+" : "-"}${Math.abs(netProfit).toFixed(2)}
           </div>
-          <div style={{ fontSize: 11, color: "#555" }}>{netRoi.toFixed(1)}% ROI</div>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ color: "#888", fontSize: 11, letterSpacing: 1, textTransform: "uppercase" }}>ROI</div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: netHasSurplus ? "#00e5a0" : "#ff4d4d" }}>
+            {netRoi.toFixed(1)}%
+          </div>
         </div>
       </div>
 
@@ -182,13 +169,7 @@ function DutchResult({ result }) {
                 Stake: <b style={{ color: "#fff" }}>${s.stake.toFixed(2)}</b>
               </span>
               <span style={{ color: "#aaa", fontSize: 13 }}>
-                Return: <b style={{ color: "#00e5a0" }}>${s.payout.toFixed(2)}</b>
-              </span>
-              <span style={{ color: "#aaa", fontSize: 13 }}>
-                Fee: <b style={{ color: "#ff8844" }}>-${s.fee.toFixed(2)}</b>
-              </span>
-              <span style={{ color: "#aaa", fontSize: 13 }}>
-                Net: <b style={{ color: netHasSurplus ? "#00e5a0" : "#ff4d4d" }}>${s.netPayout.toFixed(2)}</b>
+                Payout: <b style={{ color: "#00e5a0" }}>${s.payout.toFixed(2)}</b>
               </span>
             </div>
           </div>
@@ -201,10 +182,7 @@ function DutchResult({ result }) {
           background: "#2a1212", border: "1px solid #4a2020",
           color: "#ff8888", fontSize: 12, lineHeight: 1.5,
         }}>
-          {hasSurplus
-            ? `⚠️ Gross profitable but fees of $${totalFees.toFixed(2)} flip it negative. Need more edge to overcome fees.`
-            : `⚠️ These outcomes have ${((sumInv - 1) * 100).toFixed(1)}% vig — covering them locks in a loss even before fees.`
-          }
+          ⚠️ These outcomes have {((sumInv - 1) * 100).toFixed(1)}% vig — covering them locks in a loss even after fees.
         </div>
       )}
     </div>
