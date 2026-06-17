@@ -10,10 +10,12 @@ function calcDutch(legs, totalStake) {
     const price = 1 / leg.multiplier;        // ask price for sizing
     const fillPrice = leg.lastPrice || price; // last price for contract count
     const rawStake = totalStake * (inverses[i] / sumInv);
-    const contracts = Math.floor(rawStake / fillPrice);
-    const actualStake = contracts * fillPrice;
+    const fee_rate = 0.07 * fillPrice * (1 - fillPrice);
+    const stakeAfterFee = rawStake / (1 + fee_rate); // deduct fee first
+    const contracts = Math.floor(stakeAfterFee / fillPrice);
+    const actualStake = contracts * fillPrice + (contracts * fee_rate);
     const payout = contracts * 1;
-    const fee = contracts * 0.07 * fillPrice * (1 - fillPrice);
+    const fee = contracts * fee_rate;
     return {
       ...leg,
       stake: actualStake,
