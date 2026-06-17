@@ -40,33 +40,58 @@ function calcDutch(legs, totalStake) {
 // ── Country code → flag emoji ─────────────────────────────────────────────
 
 const TEAM_FLAGS = {
-  // Group J
-  'Argentina': '🇦🇷', 'Austria': '🇦🇹', 'Algeria': '🇩🇿', 'Jordan': '🇯🇴',
-  // Group K
-  'Portugal': '🇵🇹', 'Colombia': '🇨🇴', 'Uzbekistan': '🇺🇿', 'Congo DR': '🇨🇩',
-  // Group L
-  'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'Croatia': '🇭🇷', 'Panama': '🇵🇦', 'Ghana': '🇬🇭',
-  // Group I
-  'France': '🇫🇷', 'Senegal': '🇸🇳', 'Norway': '🇳🇴', 'Iraq': '🇮🇶',
-  // Group H
-  'Spain': '🇪🇸', 'Uruguay': '🇺🇾', 'Saudi Arabia': '🇸🇦', 'Cape Verde': '🇨🇻',
-  // Group G
-  'Belgium': '🇧🇪', 'IR Iran': '🇮🇷', 'Egypt': '🇪🇬', 'New Zealand': '🇳🇿',
-  // Group F
-  'Netherlands': '🇳🇱', 'Japan': '🇯🇵', 'Tunisia': '🇹🇳',
-  // Group E
-  'Germany': '🇩🇪', 'Ecuador': '🇪🇨', 'Ivory Coast': '🇨🇮', 'Curacao': '🇨🇼',
-  // Group D
-  'USA': '🇺🇸', 'Australia': '🇦🇺', 'Paraguay': '🇵🇾', 'Turkiye': '🇹🇷',
-  // Group C
-  'Brazil': '🇧🇷', 'Morocco': '🇲🇦', 'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'Haiti': '🇭🇹',
-  // Group B
-  'Canada': '🇨🇦', 'Switzerland': '🇨🇭', 'Qatar': '🇶🇦',
-  // Group A
-  'Mexico': '🇲🇽', 'Korea Republic': '🇰🇷', 'South Africa': '🇿🇦', 'Denmark': '🇩🇰',
-  // Others
-  'Bosnia and Herzegovina': '🇧🇦', 'Czechia': '🇨🇿', 'Sweden': '🇸🇪',
-  'Poland': '🇵🇱', 'Ukraine': '🇺🇦', 'Tie': '🤝',
+  'Argentina': '\uD83C\uDDE6\uD83C\uDDF7',
+  'Austria': '\uD83C\uDDE6\uD83C\uDDF9',
+  'Algeria': '\uD83C\uDDE9\uD83C\uDDFF',
+  'Jordan': '\uD83C\uDDEF\uD83C\uDDF4',
+  'Portugal': '\uD83C\uDDF5\uD83C\uDDF9',
+  'Colombia': '\uD83C\uDDE8\uD83C\uDDF4',
+  'Uzbekistan': '\uD83C\uDDFA\uD83C\uDDFF',
+  'Congo DR': '\uD83C\uDDE8\uD83C\uDDE9',
+  'England': '\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62\uDB40\uDC65\uDB40\uDC6E\uDB40\uDC67\uDB40\uDC7F',
+  'Croatia': '\uD83C\uDDED\uD83C\uDDF7',
+  'Panama': '\uD83C\uDDF5\uD83C\uDDE6',
+  'Ghana': '\uD83C\uDDEC\uD83C\uDDED',
+  'France': '\uD83C\uDDEB\uD83C\uDDF7',
+  'Senegal': '\uD83C\uDDF8\uD83C\uDDF3',
+  'Norway': '\uD83C\uDDF3\uD83C\uDDF4',
+  'Iraq': '\uD83C\uDDEE\uD83C\uDDF6',
+  'Spain': '\uD83C\uDDEA\uD83C\uDDF8',
+  'Uruguay': '\uD83C\uDDFA\uD83C\uDDFE',
+  'Saudi Arabia': '\uD83C\uDDF8\uD83C\uDDE6',
+  'Cape Verde': '\uD83C\uDDE8\uD83C\uDDFB',
+  'Belgium': '\uD83C\uDDE7\uD83C\uDDEA',
+  'IR Iran': '\uD83C\uDDEE\uD83C\uDDF7',
+  'Egypt': '\uD83C\uDDEA\uD83C\uDDEC',
+  'New Zealand': '\uD83C\uDDF3\uD83C\uDDFF',
+  'Netherlands': '\uD83C\uDDF3\uD83C\uDDF1',
+  'Japan': '\uD83C\uDDEF\uD83C\uDDF5',
+  'Tunisia': '\uD83C\uDDF9\uD83C\uDDF3',
+  'Germany': '\uD83C\uDDE9\uD83C\uDDEA',
+  'Ecuador': '\uD83C\uDDEA\uD83C\uDDE8',
+  'Ivory Coast': '\uD83C\uDDE8\uD83C\uDDEE',
+  'Curacao': '\uD83C\uDDE8\uD83C\uDDFC',
+  'USA': '\uD83C\uDDFA\uD83C\uDDF8',
+  'Australia': '\uD83C\uDDE6\uD83C\uDDFA',
+  'Paraguay': '\uD83C\uDDF5\uD83C\uDDFE',
+  'Turkiye': '\uD83C\uDDF9\uD83C\uDDF7',
+  'Brazil': '\uD83C\uDDE7\uD83C\uDDF7',
+  'Morocco': '\uD83C\uDDF2\uD83C\uDDE6',
+  'Scotland': '\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62\uDB40\uDC73\uDB40\uDC63\uDB40\uDC74\uDB40\uDC7F',
+  'Haiti': '\uD83C\uDDED\uD83C\uDDF9',
+  'Canada': '\uD83C\uDDE8\uD83C\uDDE6',
+  'Switzerland': '\uD83C\uDDE8\uD83C\uDDED',
+  'Qatar': '\uD83C\uDDF6\uD83C\uDDE6',
+  'Mexico': '\uD83C\uDDF2\uD83C\uDDFD',
+  'Korea Republic': '\uD83C\uDDF0\uD83C\uDDF7',
+  'South Africa': '\uD83C\uDDFF\uD83C\uDDE6',
+  'Denmark': '\uD83C\uDDE9\uD83C\uDDF0',
+  'Bosnia and Herzegovina': '\uD83C\uDDE7\uD83C\uDDE6',
+  'Czechia': '\uD83C\uDDE8\uD83C\uDDFF',
+  'Sweden': '\uD83C\uDDF8\uD83C\uDDEA',
+  'Poland': '\uD83C\uDDF5\uD83C\uDDF1',
+  'Ukraine': '\uD83C\uDDFA\uD83C\uDDE6',
+  'Tie': '\uD83E\uDD1D',
 };
 
 function getFlag(teamName) {
