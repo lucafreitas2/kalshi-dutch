@@ -63,9 +63,9 @@ async function fetchMatches() {
         .map(m => ({
           id: m.ticker,
           label: m.yes_sub_title,
-          multiplier: parseFloat((1 / m.yes_ask_dollars).toFixed(2)),
+          multiplier: parseFloat((1 / parseFloat(m.last_price_dollars)).toFixed(2)),
           impliedPct: Math.round(parseFloat(m.last_price_dollars) * 100),
-          lastPrice: parseFloat(m.last_price_dollars),  // add this
+          lastPrice: parseFloat(m.last_price_dollars),
           volume: parseFloat(m.volume_fp || 0),
         })),
     }))
