@@ -39,34 +39,39 @@ function calcDutch(legs, totalStake) {
 
 // ── Country code → flag emoji ─────────────────────────────────────────────
 
-const FLAGS = {
+const TEAM_FLAGS = {
   // Group J
-  ARG: '🇦🇷', AUT: '🇦🇹', DZA: '🇩🇿', JOR: '🇯🇴',
+  'Argentina': '🇦🇷', 'Austria': '🇦🇹', 'Algeria': '🇩🇿', 'Jordan': '🇯🇴',
   // Group K
-  POR: '🇵🇹', COL: '🇨🇴', UZB: '🇺🇿', COD: '🇨🇩',
+  'Portugal': '🇵🇹', 'Colombia': '🇨🇴', 'Uzbekistan': '🇺🇿', 'Congo DR': '🇨🇩',
   // Group L
-  ENG: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', CRO: '🇭🇷', PAN: '🇵🇦', GHA: '🇬🇭',
+  'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'Croatia': '🇭🇷', 'Panama': '🇵🇦', 'Ghana': '🇬🇭',
   // Group I
-  FRA: '🇫🇷', SEN: '🇸🇳', NOR: '🇳🇴', IRQ: '🇮🇶',
+  'France': '🇫🇷', 'Senegal': '🇸🇳', 'Norway': '🇳🇴', 'Iraq': '🇮🇶',
   // Group H
-  ESP: '🇪🇸', URU: '🇺🇾', KSA: '🇸🇦', CPV: '🇨🇻',
+  'Spain': '🇪🇸', 'Uruguay': '🇺🇾', 'Saudi Arabia': '🇸🇦', 'Cape Verde': '🇨🇻',
   // Group G
-  BEL: '🇧🇪', IRN: '🇮🇷', EGY: '🇪🇬', NZL: '🇳🇿',
+  'Belgium': '🇧🇪', 'IR Iran': '🇮🇷', 'Egypt': '🇪🇬', 'New Zealand': '🇳🇿',
   // Group F
-  NED: '🇳🇱', JPN: '🇯🇵', TUN: '🇹🇳', UKR: '🇺🇦',
+  'Netherlands': '🇳🇱', 'Japan': '🇯🇵', 'Tunisia': '🇹🇳',
   // Group E
-  GER: '🇩🇪', ECU: '🇪🇨', CIV: '🇨🇮', CUW: '🇨🇼',
+  'Germany': '🇩🇪', 'Ecuador': '🇪🇨', 'Ivory Coast': '🇨🇮', 'Curacao': '🇨🇼',
   // Group D
-  USA: '🇺🇸', AUS: '🇦🇺', PAR: '🇵🇾', TUR: '🇹🇷',
+  'USA': '🇺🇸', 'Australia': '🇦🇺', 'Paraguay': '🇵🇾', 'Turkiye': '🇹🇷',
   // Group C
-  BRA: '🇧🇷', MAR: '🇲🇦', SCO: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', HAI: '🇭🇹',
+  'Brazil': '🇧🇷', 'Morocco': '🇲🇦', 'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'Haiti': '🇭🇹',
   // Group B
-  CAN: '🇨🇦', SUI: '🇨🇭', QAT: '🇶🇦', ITA: '🇮🇹',
+  'Canada': '🇨🇦', 'Switzerland': '🇨🇭', 'Qatar': '🇶🇦',
   // Group A
-  MEX: '🇲🇽', KOR: '🇰🇷', RSA: '🇿🇦', DEN: '🇩🇰',
-  // Misc
-  SWE: '🇸🇪', POL: '🇵🇱', BOL: '🇧🇴', TIE: '🤝',
+  'Mexico': '🇲🇽', 'Korea Republic': '🇰🇷', 'South Africa': '🇿🇦', 'Denmark': '🇩🇰',
+  // Others
+  'Bosnia and Herzegovina': '🇧🇦', 'Czechia': '🇨🇿', 'Sweden': '🇸🇪',
+  'Poland': '🇵🇱', 'Ukraine': '🇺🇦', 'Tie': '🤝',
 };
+
+function getFlag(teamName) {
+  return TEAM_FLAGS[teamName] || '🏳️';
+}
 
 const MATCH_CITIES = {
   // June 16
@@ -136,18 +141,6 @@ const MATCH_CITIES = {
   'KXWCGAME-26JUN27SENIRQ': 'Boston',
 };
 
-// Extract country codes from ticker e.g. KXWCGAME-26JUN27JORARG → [JOR, ARG]
-function getTeamCodes(eventTicker) {
-  // ticker format: KXWCGAME-26MMMDDXXX YYY
-  const match = eventTicker.match(/\d{2}[A-Z]{3}\d{2}([A-Z]{3})([A-Z]{3})$/);
-  if (!match) return [null, null];
-  return [match[1], match[2]];
-}
-
-function getFlag(code) {
-  if (!code) return '🏳️';
-  return FLAGS[code.toUpperCase()] || '🏳️';
-}
 
 function formatKickoff(expectedExpirationTime) {
   if (!expectedExpirationTime) return null;
@@ -532,7 +525,7 @@ export default function App() {
                   Select match
                 </div>
                 {matches.map(m => {
-                  const [team1Code, team2Code] = getTeamCodes(m.eventTicker);
+                  const [team1Name, team2Name] = m.title.split(' vs ');
                   const city = MATCH_CITIES[m.eventTicker];
                   const kickoff = formatKickoff(m.kickoff);
                   const isSelected = selectedMatch === m.eventTicker;
@@ -546,18 +539,14 @@ export default function App() {
                     }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <span style={{ fontSize: 15, fontWeight: 700, color: isSelected ? "#fff" : "#ccc" }}>
-                          {getFlag(team1Code)} {m.title.split(' vs ')[0]}
+                          {getFlag(team1Name)} {team1Name}
                           <span style={{ color: "#555", margin: "0 6px" }}>vs</span>
-                          {getFlag(team2Code)} {m.title.split(' vs ')[1]}
+                          {getFlag(team2Name)} {team2Name}
                         </span>
                       </div>
                       <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
-                        {kickoff && (
-                          <span style={{ fontSize: 11, color: "#555" }}>🕐 {kickoff}</span>
-                        )}
-                        {city && (
-                          <span style={{ fontSize: 11, color: "#555" }}>📍 {city}</span>
-                        )}
+                        {kickoff && <span style={{ fontSize: 11, color: "#555" }}>🕐 {kickoff}</span>}
+                        {city && <span style={{ fontSize: 11, color: "#555" }}>📍 {city}</span>}
                       </div>
                     </button>
                   );
