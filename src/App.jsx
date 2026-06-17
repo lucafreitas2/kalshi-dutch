@@ -7,14 +7,15 @@ function calcDutch(legs, totalStake) {
   const sumInv = inverses.reduce((total, inv) => total + inv, 0);
 
   const stakes = legs.map((leg, i) => {
-    const stake = totalStake * (inverses[i] / sumInv);
-    const payout = stake * leg.multiplier;
     const price = 1 / leg.multiplier;
-    const contracts = stake / price;
+    const rawStake = totalStake * (inverses[i] / sumInv);
+    const contracts = Math.floor(rawStake / price);
+    const actualStake = contracts * price;
+    const payout = contracts * 1;
     const fee = contracts * 0.07 * price * (1 - price);
     return {
       ...leg,
-      stake,
+      stake: actualStake,
       payout,
       fee,
       netPayout: payout - fee,
@@ -22,11 +23,12 @@ function calcDutch(legs, totalStake) {
   });
 
   const totalFees = stakes.reduce((a, s) => a + s.fee, 0);
-  const profit = stakes[0].payout - totalStake;
-  const netProfit = stakes[0].netPayout - totalStake;
-  const roi = (profit / totalStake) * 100;
-  const netRoi = (netProfit / totalStake) * 100;
-  const hasSurplus = sumInv < 1;
+  const totalActualStake = stakes.reduce((a, s) => a + s.stake, 0);
+  const profit = stakes[0].payout - totalActualStake;
+  const netProfit = stakes[0].netPayout - totalActualStake;
+  const roi = (profit / totalActualStake) * 100;
+  const netRoi = (netProfit / totalActualStake) * 100;
+  const hasSurplus = profit > 0;
   const netHasSurplus = netProfit > 0;
 
   return { stakes, sumInv, hasSurplus, profit, roi, netProfit, netRoi, netHasSurplus, totalFees };
