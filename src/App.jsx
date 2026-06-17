@@ -40,41 +40,100 @@ function calcDutch(legs, totalStake) {
 // ── Country code → flag emoji ─────────────────────────────────────────────
 
 const FLAGS = {
-  ARG: '🇦🇷', AUT: '🇦🇹', ALG: '🇩🇿', DZA: '🇩🇿', JOR: '🇯🇴',
-  POR: '🇵🇹', COL: '🇨🇴', UZB: '🇺🇿', COD: '🇨🇩', ENG: '🇬🇧',
-  CRO: '🇭🇷', PAN: '🇵🇦', GHA: '🇬🇭', FRA: '🇫🇷', SEN: '🇸🇳',
-  NOR: '🇳🇴', IRQ: '🇮🇶', ESP: '🇪🇸', URU: '🇺🇾', KSA: '🇸🇦',
-  CPV: '🇨🇻', BEL: '🇧🇪', IRN: '🇮🇷', EGY: '🇪🇬', NZL: '🇳🇿',
-  NED: '🇳🇱', JPN: '🇯🇵', TUN: '🇹🇳', GER: '🇩🇪', ECU: '🇪🇨',
-  CIV: '🇨🇮', CUW: '🇨🇼', BRA: '🇧🇷', MAR: '🇲🇦', SCO: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-  HAI: '🇭🇹', USA: '🇺🇸', AUS: '🇦🇺', PAR: '🇵🇾', TUR: '🇹🇷',
-  QAT: '🇶🇦', SUI: '🇨🇭', CAN: '🇨🇦', MEX: '🇲🇽', KOR: '🇰🇷',
-  RSA: '🇿🇦', DEN: '🇩🇰', SWE: '🇸🇪', POL: '🇵🇱', TIE: '🤝',
+  // Group J
+  ARG: '🇦🇷', AUT: '🇦🇹', DZA: '🇩🇿', JOR: '🇯🇴',
+  // Group K
+  POR: '🇵🇹', COL: '🇨🇴', UZB: '🇺🇿', COD: '🇨🇩',
+  // Group L
+  ENG: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', CRO: '🇭🇷', PAN: '🇵🇦', GHA: '🇬🇭',
+  // Group I
+  FRA: '🇫🇷', SEN: '🇸🇳', NOR: '🇳🇴', IRQ: '🇮🇶',
+  // Group H
+  ESP: '🇪🇸', URU: '🇺🇾', KSA: '🇸🇦', CPV: '🇨🇻',
+  // Group G
+  BEL: '🇧🇪', IRN: '🇮🇷', EGY: '🇪🇬', NZL: '🇳🇿',
+  // Group F
+  NED: '🇳🇱', JPN: '🇯🇵', TUN: '🇹🇳', UKR: '🇺🇦',
+  // Group E
+  GER: '🇩🇪', ECU: '🇪🇨', CIV: '🇨🇮', CUW: '🇨🇼',
+  // Group D
+  USA: '🇺🇸', AUS: '🇦🇺', PAR: '🇵🇾', TUR: '🇹🇷',
+  // Group C
+  BRA: '🇧🇷', MAR: '🇲🇦', SCO: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', HAI: '🇭🇹',
+  // Group B
+  CAN: '🇨🇦', SUI: '🇨🇭', QAT: '🇶🇦', ITA: '🇮🇹',
+  // Group A
+  MEX: '🇲🇽', KOR: '🇰🇷', RSA: '🇿🇦', DEN: '🇩🇰',
+  // Misc
+  SWE: '🇸🇪', POL: '🇵🇱', BOL: '🇧🇴', TIE: '🤝',
 };
-
-// ── Match ticker → city ───────────────────────────────────────────────────
 
 const MATCH_CITIES = {
   // June 16
   'KXWCGAME-26JUN16ARGALG': 'Kansas City',
   'KXWCGAME-26JUN16AUTJOR': 'San Francisco',
   'KXWCGAME-26JUN16FRANSEN': 'New York/NJ',
+  'KXWCGAME-26JUN16IRNOR': 'Boston',
   // June 17
   'KXWCGAME-26JUN17PORFIF': 'Houston',
   'KXWCGAME-26JUN17ENGCRO': 'Dallas',
   'KXWCGAME-26JUN17GHAPAN': 'Toronto',
-  'KXWCGAME-26JUN17UZБCOL': 'Mexico City',
+  'KXWCGAME-26JUN17UZBCOL': 'Mexico City',
+  // June 18
+  'KXWCGAME-26JUN18RSADEN': 'Atlanta',
+  'KXWCGAME-26JUN18SUIQAT': 'Los Angeles',
+  'KXWCGAME-26JUN18CANQAT': 'Vancouver',
+  'KXWCGAME-26JUN18MEXKOR': 'Guadalajara',
+  // June 19
+  'KXWCGAME-26JUN19SCOМAR': 'Boston',
+  'KXWCGAME-26JUN19USAAUS': 'Seattle',
+  'KXWCGAME-26JUN19BRAHAI': 'Philadelphia',
+  'KXWCGAME-26JUN19TURPAR': 'San Francisco',
+  // June 20
+  'KXWCGAME-26JUN20NEDJPN': 'Houston',
+  'KXWCGAME-26JUN20GERCUW': 'Toronto',
+  'KXWCGAME-26JUN20ECUCUW': 'Kansas City',
+  'KXWCGAME-26JUN20TUNJPN': 'Monterrey',
+  // June 21
+  'KXWCGAME-26JUN21ESPCPV': 'Atlanta',
+  'KXWCGAME-26JUN21BELIRN': 'Los Angeles',
+  'KXWCGAME-26JUN21URUCPV': 'Miami',
+  'KXWCGAME-26JUN21NZLEGY': 'Vancouver',
   // June 22
   'KXWCGAME-26JUN22ARGAUT': 'Dallas',
-  'KXWCGAME-26JUN22JORАЛГ': 'San Francisco',
+  'KXWCGAME-26JUN22JORDZA': 'San Francisco',
   'KXWCGAME-26JUN22NORSEN': 'New York/NJ',
+  'KXWCGAME-26JUN22FRAIRQ': 'Philadelphia',
   // June 23
   'KXWCGAME-26JUN23PORUZB': 'Houston',
   'KXWCGAME-26JUN23ENGCRO': 'Miami',
+  'KXWCGAME-26JUN23COLCOD': 'Atlanta',
+  'KXWCGAME-26JUN23PANCRO': 'Kansas City',
+  // June 24
+  'KXWCGAME-26JUN24ESPKSA': 'Atlanta',
+  'KXWCGAME-26JUN24BELEGY': 'Los Angeles',
+  'KXWCGAME-26JUN24URUKSA': 'Miami',
+  'KXWCGAME-26JUN24NZLEGY': 'Vancouver',
+  // June 25
+  'KXWCGAME-26JUN25GERIVO': 'Houston',
+  'KXWCGAME-26JUN25NEDTUN': 'Dallas',
+  'KXWCGAME-26JUN25ECUCIV': 'Philadelphia',
+  'KXWCGAME-26JUN25USAPAR': 'San Francisco',
+  // June 26
+  'KXWCGAME-26JUN26BRAMAR': 'New York/NJ',
+  'KXWCGAME-26JUN26SCOHАІ': 'Boston',
+  'KXWCGAME-26JUN26MEXRSA': 'Atlanta',
+  'KXWCGAME-26JUN26KORDЕN': 'Los Angeles',
   // June 27
   'KXWCGAME-26JUN27JORARG': 'Dallas',
   'KXWCGAME-26JUN27DZAAUT': 'Kansas City',
   'KXWCGAME-26JUN27COLPOR': 'Houston',
+  'KXWCGAME-26JUN27CODUZB': 'Mexico City',
+  'KXWCGAME-26JUN27PANENG': 'Toronto',
+  'KXWCGAME-26JUN27CROGHA': 'Miami',
+  'KXWCGAME-26JUN27NORIRQ': 'New York/NJ',
+  'KXWCGAME-26JUN27FRAIRQ': 'Philadelphia',
+  'KXWCGAME-26JUN27SENIRQ': 'Boston',
 };
 
 // Extract country codes from ticker e.g. KXWCGAME-26JUN27JORARG → [JOR, ARG]
@@ -86,7 +145,8 @@ function getTeamCodes(eventTicker) {
 }
 
 function getFlag(code) {
-  return FLAGS[code] || '🏳️';
+  if (!code) return '🏳️';
+  return FLAGS[code.toUpperCase()] || '🏳️';
 }
 
 function formatKickoff(expectedExpirationTime) {
@@ -472,7 +532,7 @@ export default function App() {
                   Select match
                 </div>
                 {matches.map(m => {
-                  const [team1, team2] = getTeamCodes(m.eventTicker);
+                  const [team1Code, team2Code] = getTeamCodes(m.eventTicker);
                   const city = MATCH_CITIES[m.eventTicker];
                   const kickoff = formatKickoff(m.kickoff);
                   const isSelected = selectedMatch === m.eventTicker;
@@ -486,9 +546,9 @@ export default function App() {
                     }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <span style={{ fontSize: 15, fontWeight: 700, color: isSelected ? "#fff" : "#ccc" }}>
-                          {getFlag(team1)} {m.title.split(' vs ')[0]}
+                          {getFlag(team1Code)} {m.title.split(' vs ')[0]}
                           <span style={{ color: "#555", margin: "0 6px" }}>vs</span>
-                          {getFlag(team2)} {m.title.split(' vs ')[1]}
+                          {getFlag(team2Code)} {m.title.split(' vs ')[1]}
                         </span>
                       </div>
                       <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
