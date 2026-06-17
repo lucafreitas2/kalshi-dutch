@@ -37,6 +37,73 @@ function calcDutch(legs, totalStake) {
   return { stakes, sumInv, hasSurplus, profit, roi, netProfit, netRoi, netHasSurplus, totalFees };
 }
 
+// ── Country code → flag emoji ─────────────────────────────────────────────
+
+const FLAGS = {
+  ARG: '🇦🇷', AUT: '🇦🇹', ALG: '🇩🇿', DZA: '🇩🇿', JOR: '🇯🇴',
+  POR: '🇵🇹', COL: '🇨🇴', UZB: '🇺🇿', COD: '🇨🇩', ENG: '🇬🇧',
+  CRO: '🇭🇷', PAN: '🇵🇦', GHA: '🇬🇭', FRA: '🇫🇷', SEN: '🇸🇳',
+  NOR: '🇳🇴', IRQ: '🇮🇶', ESP: '🇪🇸', URU: '🇺🇾', KSA: '🇸🇦',
+  CPV: '🇨🇻', BEL: '🇧🇪', IRN: '🇮🇷', EGY: '🇪🇬', NZL: '🇳🇿',
+  NED: '🇳🇱', JPN: '🇯🇵', TUN: '🇹🇳', GER: '🇩🇪', ECU: '🇪🇨',
+  CIV: '🇨🇮', CUW: '🇨🇼', BRA: '🇧🇷', MAR: '🇲🇦', SCO: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  HAI: '🇭🇹', USA: '🇺🇸', AUS: '🇦🇺', PAR: '🇵🇾', TUR: '🇹🇷',
+  QAT: '🇶🇦', SUI: '🇨🇭', CAN: '🇨🇦', MEX: '🇲🇽', KOR: '🇰🇷',
+  RSA: '🇿🇦', DEN: '🇩🇰', SWE: '🇸🇪', POL: '🇵🇱', TIE: '🤝',
+};
+
+// ── Match ticker → city ───────────────────────────────────────────────────
+
+const MATCH_CITIES = {
+  // June 16
+  'KXWCGAME-26JUN16ARGALG': 'Kansas City',
+  'KXWCGAME-26JUN16AUTJOR': 'San Francisco',
+  'KXWCGAME-26JUN16FRANSEN': 'New York/NJ',
+  // June 17
+  'KXWCGAME-26JUN17PORFIF': 'Houston',
+  'KXWCGAME-26JUN17ENGCRO': 'Dallas',
+  'KXWCGAME-26JUN17GHAPAN': 'Toronto',
+  'KXWCGAME-26JUN17UZБCOL': 'Mexico City',
+  // June 22
+  'KXWCGAME-26JUN22ARGAUT': 'Dallas',
+  'KXWCGAME-26JUN22JORАЛГ': 'San Francisco',
+  'KXWCGAME-26JUN22NORSEN': 'New York/NJ',
+  // June 23
+  'KXWCGAME-26JUN23PORUZB': 'Houston',
+  'KXWCGAME-26JUN23ENGCRO': 'Miami',
+  // June 27
+  'KXWCGAME-26JUN27JORARG': 'Dallas',
+  'KXWCGAME-26JUN27DZAAUT': 'Kansas City',
+  'KXWCGAME-26JUN27COLPOR': 'Houston',
+};
+
+// Extract country codes from ticker e.g. KXWCGAME-26JUN27JORARG → [JOR, ARG]
+function getTeamCodes(eventTicker) {
+  // ticker format: KXWCGAME-26MMMDDXXX YYY
+  const match = eventTicker.match(/\d{2}[A-Z]{3}\d{2}([A-Z]{3})([A-Z]{3})$/);
+  if (!match) return [null, null];
+  return [match[1], match[2]];
+}
+
+function getFlag(code) {
+  return FLAGS[code] || '🏳️';
+}
+
+function formatKickoff(expectedExpirationTime) {
+  if (!expectedExpirationTime) return null;
+  // Expected expiration is ~2hrs after kickoff (90min + stoppage)
+  const expiry = new Date(expectedExpirationTime);
+  const kickoff = new Date(expiry.getTime() - 2 * 60 * 60 * 1000);
+  return kickoff.toLocaleString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
+}
+
 // ── Kalshi fetch ─────────────────────────────────────────────────────────────
 
 async function fetchMatches() {
@@ -404,18 +471,37 @@ export default function App() {
                 <div style={{ fontSize: 11, color: "#888", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>
                   Select match
                 </div>
-                {matches.map(m => (
-                  <button key={m.eventTicker} onClick={() => setSelectedMatch(m.eventTicker)} style={{
-                    display: "block", width: "100%", padding: "10px 14px", marginBottom: 6,
-                    borderRadius: 10, textAlign: "left", fontSize: 13, cursor: "pointer",
-                    border: selectedMatch === m.eventTicker ? "1.5px solid #00e5a0" : "1.5px solid #1e1f2e",
-                    background: selectedMatch === m.eventTicker ? "#0d2620" : "#13141f",
-                    color: selectedMatch === m.eventTicker ? "#fff" : "#888",
-                    fontWeight: selectedMatch === m.eventTicker ? 700 : 400,
-                  }}>
-                    {m.title}
-                  </button>
-                ))}
+                {matches.map(m => {
+                  const [team1, team2] = getTeamCodes(m.eventTicker);
+                  const city = MATCH_CITIES[m.eventTicker];
+                  const kickoff = formatKickoff(m.kickoff);
+                  const isSelected = selectedMatch === m.eventTicker;
+                  return (
+                    <button key={m.eventTicker} onClick={() => setSelectedMatch(m.eventTicker)} style={{
+                      display: "block", width: "100%", padding: "12px 14px", marginBottom: 6,
+                      borderRadius: 10, textAlign: "left", cursor: "pointer",
+                      border: isSelected ? "1.5px solid #00e5a0" : "1.5px solid #1e1f2e",
+                      background: isSelected ? "#0d2620" : "#13141f",
+                      color: isSelected ? "#fff" : "#888",
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: isSelected ? "#fff" : "#ccc" }}>
+                          {getFlag(team1)} {m.title.split(' vs ')[0]}
+                          <span style={{ color: "#555", margin: "0 6px" }}>vs</span>
+                          {getFlag(team2)} {m.title.split(' vs ')[1]}
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
+                        {kickoff && (
+                          <span style={{ fontSize: 11, color: "#555" }}>🕐 {kickoff}</span>
+                        )}
+                        {city && (
+                          <span style={{ fontSize: 11, color: "#555" }}>📍 {city}</span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             )}
             {!loading && matches.length === 0 && !error && (
