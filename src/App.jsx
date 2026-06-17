@@ -7,12 +7,13 @@ function calcDutch(legs, totalStake) {
   const sumInv = inverses.reduce((total, inv) => total + inv, 0);
 
   const stakes = legs.map((leg, i) => {
-    const price = 1 / leg.multiplier;
+    const price = 1 / leg.multiplier;        // ask price for sizing
+    const fillPrice = leg.lastPrice || price; // last price for contract count
     const rawStake = totalStake * (inverses[i] / sumInv);
-    const contracts = Math.floor(rawStake / price);
-    const actualStake = contracts * price;
+    const contracts = Math.floor(rawStake / fillPrice);
+    const actualStake = contracts * fillPrice;
     const payout = contracts * 1;
-    const fee = contracts * 0.07 * price * (1 - price);
+    const fee = contracts * 0.07 * fillPrice * (1 - fillPrice);
     return {
       ...leg,
       stake: actualStake,
@@ -64,6 +65,7 @@ async function fetchMatches() {
           label: m.yes_sub_title,
           multiplier: parseFloat((1 / m.yes_ask_dollars).toFixed(2)),
           impliedPct: Math.round(m.yes_ask_dollars * 100),
+          lastPrice: parseFloat(m.last_price_dollars),  // add this
           volume: parseFloat(m.volume_fp || 0),
         })),
     }))
