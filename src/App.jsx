@@ -5,15 +5,31 @@ import { useState, useEffect, useCallback } from "react";
 function calcDutch(legs, totalStake) {
   const inverses = legs.map(leg => 1 / leg.multiplier);
   const sumInv = inverses.reduce((total, inv) => total + inv, 0);
-  const stakes = legs.map((leg, i) => ({
-    ...leg,
-    stake: totalStake * (inverses[i] / sumInv),
-    payout: totalStake * (inverses[i] / sumInv) * leg.multiplier,
-  }));
+
+  const stakes = legs.map((leg, i) => {
+    const stake = totalStake * (inverses[i] / sumInv);
+    const payout = stake * leg.multiplier;
+    const price = 1 / leg.multiplier;
+    const contracts = stake / price;
+    const fee = contracts * 0.07 * price * (1 - price);
+    return {
+      ...leg,
+      stake,
+      payout,
+      fee,
+      netPayout: payout - fee,
+    };
+  });
+
+  const totalFees = stakes.reduce((a, s) => a + s.fee, 0);
   const profit = stakes[0].payout - totalStake;
+  const netProfit = stakes[0].netPayout - totalStake;
   const roi = (profit / totalStake) * 100;
+  const netRoi = (netProfit / totalStake) * 100;
   const hasSurplus = sumInv < 1;
-  return { stakes, sumInv, hasSurplus, profit, roi };
+  const netHasSurplus = netProfit > 0;
+
+  return { stakes, sumInv, hasSurplus, profit, roi, netProfit, netRoi, netHasSurplus, totalFees };
 }
 
 // ── Kalshi fetch ─────────────────────────────────────────────────────────────
@@ -100,54 +116,89 @@ function OutcomeRow({ outcome, excluded, onToggle, onRemove, isLive }) {
   );
 }
 
-function DutchResult({ result, stake }) {
+function DutchResult({ result }) {
   if (!result) return null;
-  const { stakes, sumInv, hasSurplus, profit, roi } = result;
+  const { stakes, sumInv, hasSurplus, profit, roi, netProfit, netRoi, netHasSurplus, totalFees } = result;
+
   return (
     <div style={{
       padding: 18, borderRadius: 14,
-      background: hasSurplus ? "#0b2a1e" : "#1e1212",
-      border: `1.5px solid ${hasSurplus ? "#00e5a0" : "#ff4d4d"}`,
+      background: netHasSurplus ? "#0b2a1e" : "#1e1212",
+      border: `1.5px solid ${netHasSurplus ? "#00e5a0" : "#ff4d4d"}`,
     }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+
+      {/* Gross vs Net profit side by side */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
         <div>
           <div style={{ color: "#888", fontSize: 11, letterSpacing: 1, textTransform: "uppercase" }}>
-            {hasSurplus ? "Guaranteed Profit" : "Guaranteed Loss"}
+            Gross Profit
           </div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: hasSurplus ? "#00e5a0" : "#ff4d4d" }}>
+          <div style={{ fontSize: 22, fontWeight: 800, color: hasSurplus ? "#00e5a0" : "#ff4d4d" }}>
             {hasSurplus ? "+" : "-"}${Math.abs(profit).toFixed(2)}
           </div>
+          <div style={{ fontSize: 11, color: "#555" }}>{roi.toFixed(1)}% ROI</div>
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ color: "#888", fontSize: 11, letterSpacing: 1, textTransform: "uppercase" }}>
+            Kalshi Fees
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: "#ff8844" }}>
+            -${totalFees.toFixed(2)}
+          </div>
+          <div style={{ fontSize: 11, color: "#555" }}>across all legs</div>
         </div>
         <div style={{ textAlign: "right" }}>
-          <div style={{ color: "#888", fontSize: 11, letterSpacing: 1, textTransform: "uppercase" }}>ROI</div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: hasSurplus ? "#00e5a0" : "#ff4d4d" }}>
-            {roi.toFixed(1)}%
+          <div style={{ color: "#888", fontSize: 11, letterSpacing: 1, textTransform: "uppercase" }}>
+            Net Profit
           </div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: netHasSurplus ? "#00e5a0" : "#ff4d4d" }}>
+            {netHasSurplus ? "+" : "-"}${Math.abs(netProfit).toFixed(2)}
+          </div>
+          <div style={{ fontSize: 11, color: "#555" }}>{netRoi.toFixed(1)}% ROI</div>
         </div>
       </div>
+
+      <div style={{ height: 1, background: "#1e2030", margin: "12px 0" }} />
+
+      {/* Stake breakdown */}
       <div style={{ color: "#888", fontSize: 11, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>
         Stake breakdown
       </div>
       {stakes.map((s, i) => (
         <div key={i} style={{
-          display: "flex", justifyContent: "space-between", alignItems: "center",
           padding: "8px 0",
           borderBottom: i < stakes.length - 1 ? "1px solid #1e2030" : "none",
         }}>
-          <span style={{ color: "#ccc", fontSize: 13 }}>{s.label}</span>
-          <div style={{ display: "flex", gap: 16 }}>
-            <span style={{ color: "#aaa", fontSize: 13 }}>Stake: <b style={{ color: "#fff" }}>${s.stake.toFixed(2)}</b></span>
-            <span style={{ color: "#aaa", fontSize: 13 }}>Return: <b style={{ color: "#00e5a0" }}>${s.payout.toFixed(2)}</b></span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ color: "#ccc", fontSize: 13 }}>{s.label}</span>
+            <div style={{ display: "flex", gap: 12 }}>
+              <span style={{ color: "#aaa", fontSize: 13 }}>
+                Stake: <b style={{ color: "#fff" }}>${s.stake.toFixed(2)}</b>
+              </span>
+              <span style={{ color: "#aaa", fontSize: 13 }}>
+                Return: <b style={{ color: "#00e5a0" }}>${s.payout.toFixed(2)}</b>
+              </span>
+              <span style={{ color: "#aaa", fontSize: 13 }}>
+                Fee: <b style={{ color: "#ff8844" }}>-${s.fee.toFixed(2)}</b>
+              </span>
+              <span style={{ color: "#aaa", fontSize: 13 }}>
+                Net: <b style={{ color: netHasSurplus ? "#00e5a0" : "#ff4d4d" }}>${s.netPayout.toFixed(2)}</b>
+              </span>
+            </div>
           </div>
         </div>
       ))}
-      {!hasSurplus && (
+
+      {!netHasSurplus && (
         <div style={{
           marginTop: 12, padding: "10px 14px", borderRadius: 8,
           background: "#2a1212", border: "1px solid #4a2020",
           color: "#ff8888", fontSize: 12, lineHeight: 1.5,
         }}>
-          ⚠️ These outcomes still have {((sumInv - 1) * 100).toFixed(1)}% vig — covering them locks in a loss.
+          {hasSurplus
+            ? `⚠️ Gross profitable but fees of $${totalFees.toFixed(2)} flip it negative. Need more edge to overcome fees.`
+            : `⚠️ These outcomes have ${((sumInv - 1) * 100).toFixed(1)}% vig — covering them locks in a loss even before fees.`
+          }
         </div>
       )}
     </div>
@@ -199,15 +250,20 @@ export default function App() {
     }
   }, []);
 
-  useEffect(() => { if (mode === "live") loadMatches(); }, [mode, loadMatches]);
   useEffect(() => {
     if (mode !== "live") return;
-    const id = setInterval(loadMatches, 30000);
-    return () => clearInterval(id);
+    const initialId = setTimeout(loadMatches, 0);
+    const intervalId = setInterval(loadMatches, 30000);
+    return () => {
+      clearTimeout(initialId);
+      clearInterval(intervalId);
+    };
   }, [mode, loadMatches]);
 
-  // Reset exclusions when match changes
-  useEffect(() => { setExcluded(new Set()); }, [selectedMatch, mode]);
+  useEffect(() => {
+    const id = setTimeout(() => setExcluded(new Set()), 0);
+    return () => clearTimeout(id);
+  }, [selectedMatch, mode]);
 
   // ── Derived ──
 
